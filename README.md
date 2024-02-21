@@ -1,3 +1,5 @@
+![Esvelo Logo](logo-esvelo.png)
+
 # Esvelo Token Accelerator
 
 ## Overview
