@@ -38,7 +38,7 @@ Contributions are welcome! If you'd like to contribute, please fork the reposito
 The code in this project is licensed under the MIT license.
 
 ## Contact
-For any queries or suggestions, please reach out to https://twitter.com/esvelo_com.
+For any queries or suggestions, please reach out to https://twitter.com/Esvel0x.
 
 ## Acknowledgements
 A special thanks to all contributors and participants who have made Esvel0x Token Accelerator a reality.
