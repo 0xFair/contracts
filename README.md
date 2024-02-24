@@ -1,9 +1,9 @@
-![Esvelo Logo](logo-esvelo.png)
+![0xFair Logo](logo-fair.png)
 
-# Esvel0x Lab
+# 0xFair Lab
 
 ## Overview
-Esvel0x Lab is a groundbreaking project focused on revolutionizing the token launch process on Uniswap. 
+0xFair Lab is a groundbreaking project focused on revolutionizing the token launch process on Uniswap. 
 Our proprietary on-chain zero risk fair launch protocol
 is designed to facilitate an equitable and efficient distribution of tokens, ensuring a fair launch free from the influence of bots and whales.
 
@@ -26,7 +26,7 @@ Building on our successful initial approach, Version 2 introduces enhanced featu
 Our smart contracts are audited and tested rigorously to ensure top-level security. We prioritize the safety of our investors' funds and strive to maintain a 100% secure platform.
 
 ## Getting Started
-To start using Esvel0x Token Accelerator, please follow the instructions below:
+To start using 0xFair Token Accelerator, please follow the instructions below:
 1. Ensure you have a compatible wallet setup.
 2. Join our allowlist to participate in upcoming token launches.
 3. Follow our guidelines to pool your ETH for the launch.
@@ -41,4 +41,4 @@ The code in this project is licensed under the MIT license.
 For any queries or suggestions, please reach out to https://twitter.com/Esvel0x.
 
 ## Acknowledgements
-A special thanks to all contributors and participants who have made Esvel0x Token Accelerator a reality.
+A special thanks to all contributors and participants who have made 0xFair Token Accelerator a reality.
