@@ -38,7 +38,7 @@ Contributions are welcome! If you'd like to contribute, please fork the reposito
 The code in this project is licensed under the MIT license.
 
 ## Contact
-For any queries or suggestions, please reach out to https://twitter.com/Esvel0x.
+For any queries or suggestions, please reach out to https://twitter.com/0xfair_lab.
 
 ## Acknowledgements
 A special thanks to all contributors and participants who have made 0xFair Token Accelerator a reality.
