@@ -1,29 +1,34 @@
 ![0xFair Logo](logo-fair.png)
 
-# 0xFair Lab
+# 0xFair Lab Smart Contracts
+
+Welcome to the official GitHub repository for 0xFair Lab's smart contracts. This repository houses the codebase for our innovative First Buy Protocol and other blockchain contracts that power our fair and transparent token launch platform.
 
 ## Overview
-0xFair Lab is a groundbreaking project focused on revolutionizing the token launch process on Uniswap. 
-Our proprietary on-chain zero risk fair launch protocol
-is designed to facilitate an equitable and efficient distribution of tokens, ensuring a fair launch free from the influence of bots and whales.
+
+0xFair Lab leverages blockchain technology to redefine token launches. Our smart contracts are designed to ensure fairness, security, and transparency in every launch. This repository includes the UniswapFirstBuy contract and other related contracts that facilitate our unique launch process.
 
 ### Key Features
-- **Proprietary Uniswap Launch Contracts:** Customized smart contracts tailored for launching tokens on Uniswap.
-- **Allowlist-Based Pooling:** Secure pooling of ETH from members before the launch, ensuring participation is reserved for allowlist participants.
-- **Simultaneous Purchase and Launch:** All pooled ETH is used to purchase tokens for allowlist participants in the same transaction as the Uniswap launch.
-- **Perfect Token Distribution:** Aimed at fostering growth by avoiding early monopolization of the tokens by bots and whales.
 
-## Version 2: Risk-Free Token Accelerator
-Building on our successful initial approach, Version 2 introduces enhanced features leveraging Uniswap V3's concentrated liquidity and our proprietary algorithms.
+- **Fair Launch Protocol:** Ensuring early and equitable access to token launches.
+- **Audited Smart Contracts:** Providing a secure and reliable platform for investors.
+- **Liquidity Lock:** Guaranteeing safety against rug pulls.
+- **Community-Centric Approach:** Fostering a global network of blockchain enthusiasts.
 
-### Upcoming Features
-- **Guaranteed Value for Investors:** Ensure that allowlist participants can sell their tokens at least at the value they bought them.
-- **Leveraging Uniswap V3 Liquidity:** Utilizing concentrated liquidity to provide better investment security.
-- **Secure Investments for Whitelist Investors:** Our smart contracts are designed to guarantee that investors can always sell their tokens at or above their invested capital level.
-- **Liquidity Management:** Advanced management of liquidity to prevent pulling, ensuring a stable and secure environment for token launches.
+## Contracts
 
-## Security
-Our smart contracts are audited and tested rigorously to ensure top-level security. We prioritize the safety of our investors' funds and strive to maintain a 100% secure platform.
+- `UniswapFirstBuy.sol`: Manages the initial buy process on Uniswap, ensuring a fair launch.
+- Other supporting contracts...
+
+### UniswapFirstBuy Contract
+
+The `UniswapFirstBuy` contract is central to our First Buy Protocol. It handles the contributions from allowlisted members, conducts the initial purchase of new tokens on Uniswap, and manages the distribution to contributors. 
+
+Key functionalities include:
+- Allowlist management.
+- Contribution tracking and limits.
+- Token launch and initial liquidity provision.
+- Token purchase and distribution.
 
 ## Getting Started
 To start using 0xFair Token Accelerator, please follow the instructions below:
@@ -38,7 +43,7 @@ Contributions are welcome! If you'd like to contribute, please fork the reposito
 The code in this project is licensed under the MIT license.
 
 ## Contact
-For any queries or suggestions, please reach out to https://twitter.com/0xfair_lab.
+For any queries or suggestions, please reach out to https://twitter.com/0xfair_eth.
 
 ## Acknowledgements
 A special thanks to all contributors and participants who have made 0xFair Token Accelerator a reality.
