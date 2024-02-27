@@ -121,7 +121,7 @@ abstract contract UniswapTaxToken is ERC20, ERC20Burnable, Ownable { //}ERC20Bur
         }
 
         uint256 contractTokenBalance = balanceOf(address(this));
-        bool canSwap = contractTokenBalance >= swapTokensAtAmount();
+        bool canSwap = isLiquidityAdded && (contractTokenBalance >= swapTokensAtAmount());
 
         if (
             canSwap &&
@@ -165,6 +165,10 @@ abstract contract UniswapTaxToken is ERC20, ERC20Burnable, Ownable { //}ERC20Bur
     }
 
     function setAutomatedMarketMakerPair(address pair, bool value) public onlyOwner {
+        _setAutomatedMarketMakerPair(pair, value);
+    }
+
+    function _setAutomatedMarketMakerPair(address pair, bool value) private {
         automatedMarketMakerPairs[pair] = value;
     }
 
@@ -211,13 +215,16 @@ abstract contract UniswapTaxToken is ERC20, ERC20Burnable, Ownable { //}ERC20Bur
     }
 
     // Function to add initial liquidity to Uniswap
-    function addInitialLiquidity(uint256 tokenAmount) public payable onlyOwner {
+    function addInitialLiquidity(uint256 tokenAmount) public payable {
         require(!isLiquidityAdded, "Liquidity already added, can't add it again");
+        require(tokenAmount > 0, "Must add some tokens");
+        require(balanceOf(msg.sender) >= tokenAmount, "Insufficient balance");
+        require(msg.value > 0, "Must send some ETH");
 
         uniswapV2Pair = IUniswapV2Factory(uniswapV2Router.factory())
             .createPair(address(this), uniswapV2Router.WETH());
 
-        setAutomatedMarketMakerPair(address(uniswapV2Pair), true);
+        _setAutomatedMarketMakerPair(address(uniswapV2Pair), true);
 
         transfer(address(this), tokenAmount);
         _approve(address(this), address(uniswapV2Router), tokenAmount);

@@ -53,21 +53,27 @@ interface IAllowlist {
 interface ITaxToken {
     function addInitialLiquidity(uint256 tokenAmount) external payable;
     function transfer(address to, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount) external returns (bool);
     function balanceOf(address account) external view returns (uint256);
 }
 
 contract UniswapFirstBuy is Ownable {
     uint256 public totalEthContributed;
     uint256 public totalTokensBought;
+
     uint256 public maxContribution = 0.1 ether;
+    uint256 public maxTotalContribution = 10 ether;
+    mapping(address => uint256) public ethContributions;
+
     address public firstBuyAllowlist;
-    address public tokenAddress;
     ITaxToken public token;
-    bool public isOpen = false;
+
+    bool public isOpen = true;
     bool public isLiquidityAdded = false;
+
     IUniswapV2Router02 public immutable uniswapV2Router;
 
-    mapping(address => uint256) public ethContributions;
+    event EthContributed(address addr, uint256 amount);
 
     constructor(address uniswapAddress)
     {
@@ -77,7 +83,6 @@ contract UniswapFirstBuy is Ownable {
     }
 
     function setTokenAddress(address addr) public onlyOwner {
-        tokenAddress = addr;
         token = ITaxToken(addr);
     }
 
@@ -85,18 +90,22 @@ contract UniswapFirstBuy is Ownable {
         maxContribution = newMax;
     }
 
-    function setIsOpen(bool open) public onlyOwner {
-        isOpen = open;
+    function setMaxTotalContribution(uint256 newMax) public onlyOwner {
+        maxTotalContribution = newMax;
     }
 
     function setFirstBuyAllowlist(address addr) public onlyOwner {
         firstBuyAllowlist = addr;
     }
 
-    function launchToken(uint256 tokenAmount)  public payable onlyOwner {
+    function launchToken(uint256 tokenAmount) public payable onlyOwner {
+        require(!isLiquidityAdded, "Already launched");
+        require(msg.value > 0, "Must send ETH");
+
         isOpen = false;
 
-        token.addInitialLiquidity(tokenAmount);
+        token.approve(address(token), tokenAmount);
+        token.addInitialLiquidity{value: msg.value}(tokenAmount);
 
         if (totalEthContributed > 0)
             buyTokensWithEth(totalEthContributed);
@@ -104,15 +113,20 @@ contract UniswapFirstBuy is Ownable {
         isLiquidityAdded = true;
     }
 
-    // Function to receive ETH contributions
     receive() external payable {
-        require(!isOpen, "Contributions closed now");
+        require(isOpen, "Contributions closed now");
         require(IAllowlist(firstBuyAllowlist).isOnAllowlist(msg.sender), "Must be on our allowlist");
         require(ethContributions[msg.sender] + msg.value <= maxContribution, "Contribution exceeds limit");
 
         ethContributions[msg.sender] += msg.value;
         totalEthContributed += msg.value;
+
+        require(totalEthContributed <= maxTotalContribution, "Total contribution exceeds limit");
+
+        emit EthContributed(msg.sender, msg.value);
     }
+
+    fallback() external payable {}
 
     // Function to buy tokens with the ETH pool
     function buyTokensWithEth(uint256 ethAmount) internal {
@@ -121,18 +135,20 @@ contract UniswapFirstBuy is Ownable {
         // Set up the path to swap ETH for tokens
         address[] memory path = new address[](2);
         path[0] = uniswapV2Router.WETH();
-        path[1] = address(this);
+        path[1] = address(token);
+
+        uint256 initialTokenBalance = token.balanceOf(address(this));
 
         // Make the swap
         uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: ethAmount}(
-            0, // accept any amount of Tokens
+            0, // accept any number of Tokens
             path,
             address(this),
             block.timestamp
         );
 
         // Update the total tokens bought
-        totalTokensBought = token.balanceOf(address(this));
+        totalTokensBought = token.balanceOf(address(this)) - initialTokenBalance;
     }
 
     // Function for users to withdraw their tokens
