@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.23;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -46,26 +46,22 @@ interface IUniswapV2Router02 {
     ) external;
 }
 
-interface IAllowlist {
-    function isOnAllowlist(address addr) external returns (bool);
-}
-
 interface ITaxToken {
     function addInitialLiquidity(uint256 tokenAmount) external payable;
     function transfer(address to, uint256 amount) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
     function approve(address spender, uint256 amount) external returns (bool);
     function balanceOf(address account) external view returns (uint256);
+    function transferOwnership(address newOwner) external;
 }
 
 contract UniswapFirstBuy is Ownable {
     uint256 public totalEthContributed;
     uint256 public totalTokensBought;
 
-    uint256 public maxContribution = 0.1 ether;
-    uint256 public maxTotalContribution = 10 ether;
+    uint256 public maxContribution = 0.5 ether;
     mapping(address => uint256) public ethContributions;
 
-    address public firstBuyAllowlist;
     ITaxToken public token;
 
     bool public isOpen = true;
@@ -90,12 +86,8 @@ contract UniswapFirstBuy is Ownable {
         maxContribution = newMax;
     }
 
-    function setMaxTotalContribution(uint256 newMax) public onlyOwner {
-        maxTotalContribution = newMax;
-    }
-
-    function setFirstBuyAllowlist(address addr) public onlyOwner {
-        firstBuyAllowlist = addr;
+    function setIsOpen(bool _isOpen) public onlyOwner {
+        isOpen = _isOpen;
     }
 
     function launchToken(uint256 tokenAmount) public payable onlyOwner {
@@ -104,6 +96,7 @@ contract UniswapFirstBuy is Ownable {
 
         isOpen = false;
 
+        token.transferFrom(msg.sender, address(this), tokenAmount);
         token.approve(address(token), tokenAmount);
         token.addInitialLiquidity{value: msg.value}(tokenAmount);
 
@@ -115,18 +108,17 @@ contract UniswapFirstBuy is Ownable {
 
     receive() external payable {
         require(isOpen, "Contributions closed now");
-        require(IAllowlist(firstBuyAllowlist).isOnAllowlist(msg.sender), "Must be on our allowlist");
+        require(msg.value > 0, "Must send ETH");
         require(ethContributions[msg.sender] + msg.value <= maxContribution, "Contribution exceeds limit");
+
+        // TODO: add FAIR holdings check.
+        // TODO: also check when launching!
 
         ethContributions[msg.sender] += msg.value;
         totalEthContributed += msg.value;
 
-        require(totalEthContributed <= maxTotalContribution, "Total contribution exceeds limit");
-
         emit EthContributed(msg.sender, msg.value);
     }
-
-    fallback() external payable {}
 
     // Function to buy tokens with the ETH pool
     function buyTokensWithEth(uint256 ethAmount) internal {
@@ -157,13 +149,28 @@ contract UniswapFirstBuy is Ownable {
         uint256 userEthContribution = ethContributions[msg.sender];
         require(userEthContribution > 0, "No ETH contribution");
 
-        uint256 tokenAmount = calculateTokenAmount(userEthContribution);
+        uint256 tokenAmount = calculateTokenAmount(msg.sender);
         ethContributions[msg.sender] = 0;
         token.transfer(msg.sender, tokenAmount);
     }
 
     // Calculate the amount of tokens a user can withdraw
-    function calculateTokenAmount(uint256 userEthContribution) public view returns (uint256) {
-        return (userEthContribution * totalTokensBought) / totalEthContributed;
+    function calculateTokenAmount(address userAddy) public view returns (uint256) {
+        if (totalEthContributed == 0)
+            return 0;
+
+        return (ethContributions[userAddy] * totalTokensBought) / totalEthContributed;
+    }
+
+    function getCurrentContribution() public view returns (uint256) {
+        return ethContributions[msg.sender];
+    }
+
+    function setTokenOwner(address newOwner) public onlyOwner {
+        token.transferOwnership(newOwner);
+    }
+
+    function emergencyWithdraw() public onlyOwner {
+        payable(owner()).transfer(address(this).balance);
     }
 }

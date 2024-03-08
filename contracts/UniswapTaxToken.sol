@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.23;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
@@ -77,7 +77,7 @@ interface IUniswapV2Factory {
     function createPair(address tokenA, address tokenB) external returns (address pair);
 }
 
-abstract contract UniswapTaxToken is ERC20, ERC20Burnable, Ownable { //}ERC20Burnable, ERC20Permit, Ownable {
+abstract contract UniswapTaxToken is ERC20, ERC20Burnable, Ownable {
     uint public tax;
     address public taxWallet;
 
@@ -88,11 +88,11 @@ abstract contract UniswapTaxToken is ERC20, ERC20Burnable, Ownable { //}ERC20Bur
     mapping(address => bool) public automatedMarketMakerPairs;
 
     bool private swapping;
+    bool private extra_liquidity;
     bool public isLiquidityAdded = false;
+    uint256 public liqTimestamp = 0;
 
-    constructor(address uniswapAddress, uint taxAmount)
-//        ERC20("UniV2", "UNIV2")
-//        ERC20Permit("UniV2")
+    constructor(address uniswapAddress, uint taxAmount, uint supply)
     {
         uniswapV2Router = IUniswapV2Router02(
             uniswapAddress //Uniswap V2 Router
@@ -101,10 +101,11 @@ abstract contract UniswapTaxToken is ERC20, ERC20Burnable, Ownable { //}ERC20Bur
         excludeFromFees(msg.sender, true);
         excludeFromFees(address(this), true);
 
-        _mint(msg.sender, 1_000_000_000 * 10 ** decimals());
+        _mint(msg.sender, supply * 10 ** decimals());
 
         taxWallet = msg.sender;
         tax = taxAmount;
+        extra_liquidity = false;
     }
 
     function _transfer(
@@ -240,5 +241,6 @@ abstract contract UniswapTaxToken is ERC20, ERC20Burnable, Ownable { //}ERC20Bur
         );
 
         isLiquidityAdded = true;
+        liqTimestamp = block.timestamp;
     }
 }
